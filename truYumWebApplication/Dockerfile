@@ -1,21 +1,13 @@
-#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-FROM mcr.microsoft.com/dotnet/aspnet:3.1 AS base
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build-env
 WORKDIR /app
-EXPOSE 80
 
-FROM mcr.microsoft.com/dotnet/sdk:3.1 AS build
-WORKDIR /src
-COPY ["truYumWebApplication/truYumWebApplication.csproj", "truYumWebApplication/"]
-RUN dotnet restore "truYumWebApplication/truYumWebApplication.csproj"
-COPY . .
-WORKDIR "/src/truYumWebApplication"
-RUN dotnet build "truYumWebApplication.csproj" -c Release -o /app/build
+COPY *.csproj ./
+RUN dotnet restore
+COPY . ./
 
-FROM build AS publish
-RUN dotnet publish "truYumWebApplication.csproj" -c Release -o /app/publish
+RUN dotnet publish -c Release -o out
 
-FROM base AS final
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
 WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "truYumWebApplication.dll"]
+COPY --from-build-env /app/out .
+ENTRYPOINT ["dotnet","WebApiValuesService.dll"]
