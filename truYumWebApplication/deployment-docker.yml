@@ -15,12 +15,12 @@ spec:
         app: truYumWebApplication
       spec:
         containers:
-          name: truYumWebApplication
+        - name: truYumWebApplication
           image: truyum.azurecr.io/new:latest
           ports:
-            containerPort: 8080
+          - containerPort: 8080
         imagePullSecrets:
-           name: truyumconsvcsecret
+        - name: truyumconsvcsecret
 ---
 apiVersion: v1
 kind: Service
